@@ -29,8 +29,8 @@
                     <h1>Пользователи</h1>
                     <p>
                         <span>Всего пользователей: {{countOfUsers}}</span>
-                        <button type="button" v-on:click="isUserListDisplay = !isUserListDisplay" v-tooltip.right="buttonTitle">
-                            {{buttonTitle}}
+                        <button type="button" v-on:click="isUserListDisplay = !isUserListDisplay" v-tooltip.right="buttonComputedTitleShowUserList">
+                            {{buttonComputedTitleShowUserList}}
                         </button>
                     </p>
                     <!-- table of users -->
@@ -56,7 +56,7 @@
                                         <td>{{user.thirdName | toUpperCase}}</td>
                                         <td>{{user.secondName | toUpperCase}}</td>
                                         <td>
-                                            <button type="button" v-copy="user.firstName + ' ' +user.thirdName"><i class="fa fa-copy"></i></button>
+                                            <button type="button" v-copy="user.firstName + ' ' +user.thirdName" v-tooltip.right="'Копировать'"><i class="fa fa-copy"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -86,7 +86,7 @@
                 countOfUsers: function () {
                     return this.users.length;
                 },
-                buttonTitle: function () {
+                buttonComputedTitleShowUserList: function () {
                     return (this.isUserListDisplay ? 'Скрыть' : 'Показать') + ' список';
                 }
             },
