@@ -9,29 +9,11 @@
 
     
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <!-- <script src="node_modules/v-copy/dist/v-copy.js"></script> -->
     <script src="https://unpkg.com/v-copy@0.1.0/dist/v-copy.js"></script>
-    <!-- <script src="node_modules/v-tooltip/dist/v-tooltip.umd.js"></script> -->
     <script src="https://unpkg.com/v-tooltip"></script>
 
     <style>
-        .container-fluid .row span {
-            height: 70px; /* image's height */
-            display: table-cell;
-            vertical-align: middle;
-        }
-        .colored-children:nth-child(2n) {
-            background-color: gray;
-        }
-        .colored-children:nth-child(2n+1) {
-            background-color: lightgray;
-        }
-        .head {
-            background-color: lightcyan;
-        }
-        .table .button-wrapper {
-            height: 70px; /* image's height */
-            display: table-cell;
+        .table td, .table th {
             vertical-align: middle;
         }
         [v-cloak] {
@@ -47,58 +29,38 @@
                     <h1>Пользователи</h1>
                     <p>
                         <span>Всего пользователей: {{countOfUsers}}</span>
-                        <button type="button" v-on:click="isDisplay = !isDisplay" v-tooltip.right="buttonTitle">{{buttonTitle}}</button>
+                        <button type="button" v-on:click="isUserListDisplay = !isUserListDisplay" v-tooltip.right="buttonTitle">
+                            {{buttonTitle}}
+                        </button>
                     </p>
                     <!-- table of users -->
                     <div class="col-6">
-                      <!-- header -->
-                    <div class="row table head">
-                        <!-- avatar -->
-                            <div class="col-2">
-                            </div>
-                        <!-- first name -->
-                            <div class="col-3">
-                                <span>Имя</span>
-                            </div>
-                        <!-- second name -->
-                            <div class="col-3">
-                                <span>Фамилия</span>
-                            </div>
-                        <!-- third name -->
-                            <div class="col-3">
-                                <span>Отчество</span>
-                            </div>
-                        <!-- actions -->
-                        <div class="col-1">
-                        </div>
-                      </div>
-                        <!-- body -->
-                        <div class="body-wrapper" v-if="isDisplay">
-                            <div class="row table colored-children" v-for="user in users" :key="user.id">
-                                    <!-- avatar -->
-                                    <div class="col-2">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Аватарка</th>
+                                        <th scope="col">Имя</th>
+                                        <th scope="col">Фамилия</th>
+                                        <th scope="col">Отчество</th>
+                                        <th scope="col">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody v-show="isUserListDisplay">
+                                    <tr v-for="(user, index) in users" :key="user.id">
+                                        <th scope="row">{{index + 1}}</th>
+                                        <td>
                                             <img v-bind:src="userAvatar(user)" height="70">
-                                    </div>
-                                    <!-- first name -->
-                                    <div class="col-3">
-                                        <span>{{user.firstName | toUpperCase}}</span>
-                                    </div>
-                                    <!-- second name -->
-                                    <div class="col-3">
-                                        <span>{{user.thirdName | toUpperCase}}</span>
-                                    </div>
-                                    <!-- third name -->
-                                    <div class="col-3">
-                                        <span>{{user.secondName | toUpperCase}}</span>
-                                    </div>
-                                    <!-- actions -->
-                                    <div class="col-1">
-                                        <div class="button-wrapper">
-                                            <button type="button" v-copy='user.firstName + " " +user.thirdName'><i class="fa fa-copy"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                        </div>
+                                        </td>
+                                        <td>{{user.firstName | toUpperCase}}</td>
+                                        <td>{{user.thirdName | toUpperCase}}</td>
+                                        <td>{{user.secondName | toUpperCase}}</td>
+                                        <td>
+                                            <button type="button" v-copy="user.firstName + ' ' +user.thirdName"><i class="fa fa-copy"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
             </div>
           
         </div>
@@ -110,37 +72,22 @@
             el: '#app',
             data: function () {
                 return {
-                    isDisplay: true,
+                    isUserListDisplay: true,
                     defaultAvatarLink: 'resources/images/default-avatar.png',
-                    users: [
-                        { firstName: 'Francesco', secondName: 'Johnovna', thirdName: 'Canfield', avatarLink: 'resources/images/20131107_213317_4797_ALICIA.png', id: 1},
-                        { firstName: 'Penni', secondName: 'Johnovich', thirdName: 'Pflum', avatarLink: null, id: 2},
-                        { firstName: 'Alaina', secondName: 'Johnovich', thirdName: 'Croslin', avatarLink: 'resources/images/20120419_163008_2477_sdf.png', id: 3},
-                        { firstName: 'Laurice', secondName: 'Johnovich', thirdName: 'Askey', avatarLink: 'resources/images/unr_test_161024_0535_9lih90.png', id: 4},
-                        { firstName: 'Frankie', secondName: 'Johnovna', thirdName: 'Hoots', avatarLink: null, id: 5}
-                    ]
+                    users: []
                 }
             },
             methods: {
                 userAvatar: function (user) {
-                    return user.avatarLink ? user.avatarLink : this.defaultAvatarLink;
+                    return user.avatarLink || this.defaultAvatarLink;
                 }
             },
             computed: {
                 countOfUsers: function () {
                     return this.users.length;
                 },
-                usersInUpperCase: function () {
-                    return this.users.filter(function (user) {
-                        let tempUser = user;
-                        tempUser.firstName = user.firstName.toUpperCase();
-                        tempUser.secondName = user.secondName.toUpperCase();
-                        tempUser.thirdName = user.thirdName.toUpperCase();
-                        return tempUser;
-                    })
-                },
                 buttonTitle: function () {
-                    return (this.isDisplay ? 'Скрыть' : 'Показать') + ' список';
+                    return (this.isUserListDisplay ? 'Скрыть' : 'Показать') + ' список';
                 }
             },
             filters: {
@@ -149,15 +96,14 @@
                     return value.toUpperCase()
                 }
             },
-            directives: {
-                // tooltip: {
-                //     bind: function (el, binding) {
-                //         el.title = binding.value ? 'Скрыть список' : 'Показать список';
-                //     },
-                //     update: function (el, binding) {
-                //         el.title = binding.value ? 'Скрыть список' : 'Показать список';
-                //     } 
-                // }
+            mounted: function () {
+                this.users = [
+                        { firstName: 'Francesco', secondName: 'Johnovna', thirdName: 'Canfield', avatarLink: 'resources/images/20131107_213317_4797_ALICIA.png', id: 1},
+                        { firstName: 'Penni', secondName: 'Johnovich', thirdName: 'Pflum', avatarLink: null, id: 2},
+                        { firstName: 'Alaina', secondName: 'Johnovich', thirdName: 'Croslin', avatarLink: 'resources/images/20120419_163008_2477_sdf.png', id: 3},
+                        { firstName: 'Laurice', secondName: 'Johnovich', thirdName: 'Askey', avatarLink: 'resources/images/unr_test_161024_0535_9lih90.png', id: 4},
+                        { firstName: 'Frankie', secondName: 'Johnovna', thirdName: 'Hoots', avatarLink: null, id: 5}
+                    ]
             }
         });
     </script>
