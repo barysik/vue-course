@@ -1,0 +1,12 @@
+{
+  "name": "vue-course",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/barysik/vue-course.git",
+  "author": "Barysik Artsem",
+  "license": "MIT",
+  "dependencies": {
+    "v-copy": "^0.1.0",
+    "v-tooltip": "^2.0.0-rc.33"
+  }
+}
