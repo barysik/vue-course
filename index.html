@@ -74,22 +74,22 @@
                       </div>
                         <!-- body -->
                         <div class="body-wrapper" v-if="isDisplay">
-                            <div class="row table colored-children" v-for="user in usersInUpperCase" :key="user.id">
+                            <div class="row table colored-children" v-for="user in users" :key="user.id">
                                     <!-- avatar -->
                                     <div class="col-2">
                                             <img v-bind:src="userAvatar(user)" height="70">
                                     </div>
                                     <!-- first name -->
                                     <div class="col-3">
-                                        <span v-text="user.firstName"></span>
+                                        <span>{{user.firstName | toUpperCase}}</span>
                                     </div>
                                     <!-- second name -->
                                     <div class="col-3">
-                                        <span v-text="user.thirdName"></span>
+                                        <span>{{user.thirdName | toUpperCase}}</span>
                                     </div>
                                     <!-- third name -->
                                     <div class="col-3">
-                                        <span v-text="user.secondName"></span>
+                                        <span>{{user.secondName | toUpperCase}}</span>
                                     </div>
                                     <!-- actions -->
                                     <div class="col-1">
@@ -141,6 +141,12 @@
                 },
                 buttonTitle: function () {
                     return (this.isDisplay ? 'Скрыть' : 'Показать') + ' список';
+                }
+            },
+            filters: {
+                toUpperCase: function (value) {
+                    if (!value) return ''
+                    return value.toUpperCase()
                 }
             },
             directives: {
