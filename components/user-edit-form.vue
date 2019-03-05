@@ -42,7 +42,7 @@
                 var self = this;
                 axios.get('http://localhost:3000/users?id=' + id)
                     .then(function (response) {
-                        self.user = response.data;
+                        self.user = response.data[0];
                     });
              }
         }
