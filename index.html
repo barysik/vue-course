@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="resources/styles/tooltip.css">
 
     
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/v-copy@0.1.0/dist/v-copy.js"></script>
-    <script src="https://unpkg.com/v-tooltip"></script>
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <script src="node_modules/v-copy/dist/v-copy.js"></script>
+    <script src="node_modules/v-tooltip/dist/v-tooltip.umd.js"></script>
+    <script src="node_modules/axios/dist/axios.js"></script>
+    <script src="node_modules/http-vue-loader/src/httpVueLoader.js"></script>
 
     <style>
         .table td, .table th {
@@ -26,45 +28,18 @@
   <body>
         <div class="container-fluid">
             <div id="app" v-cloak>
-                    <h1>Пользователи</h1>
-                    <p>
-                        <span>Всего пользователей: {{countOfUsers}}</span>
-                        <button type="button" v-on:click="isUserListDisplay = !isUserListDisplay" v-tooltip.right="buttonComputedTitleShowUserList">
-                            {{buttonComputedTitleShowUserList}}
-                        </button>
-                    </p>
-                    <!-- table of users -->
+                    <h1>{{titleOfPage}}</h1>
+                    
                     <div class="col-6">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Аватарка</th>
-                                        <th scope="col">Имя</th>
-                                        <th scope="col">Фамилия</th>
-                                        <th scope="col">Отчество</th>
-                                        <th scope="col">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody v-show="isUserListDisplay">
-                                    <tr v-for="(user, index) in users" :key="user.id">
-                                        <th scope="row">{{index + 1}}</th>
-                                        <td>
-                                            <img v-bind:src="userAvatar(user)" height="70">
-                                        </td>
-                                        <td>{{user.firstName | toUpperCase}}</td>
-                                        <td>{{user.thirdName | toUpperCase}}</td>
-                                        <td>{{user.secondName | toUpperCase}}</td>
-                                        <td>
-                                            <button type="button" v-copy="user.firstName + ' ' +user.thirdName" v-tooltip.right="'Копировать'"><i class="fa fa-copy"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-            </div>
-          
-        </div>
+                        <!-- table of users -->
+                        <users-grid v-bind:users="users" v-on:edit-user="editUser" v-show="isUserListDisplay"></users-grid>
 
+                        <!-- edit form -->
+                        <user-edit-form v-bind:id="editingUserId" v-on:save-user="saveUser" v-if="isUserEditFormDisplay"></user-edit-form>
+                    </div>
+          
+            </div>
+        </div>
   </body>
 
   <script>
@@ -73,38 +48,53 @@
             data: function () {
                 return {
                     isUserListDisplay: true,
-                    defaultAvatarLink: 'resources/images/default-avatar.png',
-                    users: []
-                }
-            },
-            methods: {
-                userAvatar: function (user) {
-                    return user.avatarLink || this.defaultAvatarLink;
-                }
-            },
-            computed: {
-                countOfUsers: function () {
-                    return this.users.length;
-                },
-                buttonComputedTitleShowUserList: function () {
-                    return (this.isUserListDisplay ? 'Скрыть' : 'Показать') + ' список';
-                }
-            },
-            filters: {
-                toUpperCase: function (value) {
-                    if (!value) return ''
-                    return value.toUpperCase()
+                    isUserEditFormDisplay: false,
+                    users: [],
+                    editingUserId: null
                 }
             },
             mounted: function () {
-                this.users = [
-                        { firstName: 'Francesco', secondName: 'Johnovna', thirdName: 'Canfield', avatarLink: 'resources/images/20131107_213317_4797_ALICIA.png', id: 1},
-                        { firstName: 'Penni', secondName: 'Johnovich', thirdName: 'Pflum', avatarLink: null, id: 2},
-                        { firstName: 'Alaina', secondName: 'Johnovich', thirdName: 'Croslin', avatarLink: 'resources/images/20120419_163008_2477_sdf.png', id: 3},
-                        { firstName: 'Laurice', secondName: 'Johnovich', thirdName: 'Askey', avatarLink: 'resources/images/unr_test_161024_0535_9lih90.png', id: 4},
-                        { firstName: 'Frankie', secondName: 'Johnovna', thirdName: 'Hoots', avatarLink: null, id: 5}
-                    ]
+                this.loadUsers();
+            },
+            components: {
+                'users-grid': httpVueLoader('components/users-grid.vue'),
+                'user-edit-form': httpVueLoader('components/user-edit-form.vue')
+            },
+            computed: {
+                titleOfPage: function () {
+                    return (this.isUserListDisplay && !this.isUserEditFormDisplay) ? 'Users List' : 'Edit User';
+                }
+            },
+            watch: {
+                users: {
+                    handler: function (curr, prev) {
+                        if (!prev.length && curr.length) {
+                            console.log('Users was loaded!');
+                        }
+                    }
+                }
+            },
+            methods: {
+                loadUsers: function() {
+                    var self = this;
+                    axios.get('http://localhost:3000/users')
+                        .then(function (response) {
+                            self.users = response.data;
+                        });
+                },
+                editUser: function (id) {
+                    this.editingUserId = id;
+                    this.isUserListDisplay = false;
+                    this.isUserEditFormDisplay = true;
+                },
+                saveUser: function () {
+                    this.isUserEditFormDisplay = false;
+                    this.editingUserId = null;
+                    this.isUserListDisplay = true;
+                    
+                }
             }
+            
         });
     </script>
 
